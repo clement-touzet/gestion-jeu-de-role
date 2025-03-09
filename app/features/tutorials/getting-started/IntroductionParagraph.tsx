@@ -1,11 +1,29 @@
+"use client";
+
 import H2 from "@/app/components/ui/H2";
 import HorizontalSpacing from "@/app/components/ui/horizontal-spacing";
+import { ClassType, RaceType } from "@/app/db/schemas";
 import { CharacterStatisticsRadarChart } from "@/app/features/character-creation/components/CharacterStatisticsRadarChart";
 import ClassSelect from "@/app/features/character-creation/components/ClassSelect";
 import RaceSelect from "@/app/features/character-creation/components/RaceSelect";
-import React from "react";
+import React, { useState } from "react";
 
-const IntroductionParagraph = () => {
+type Props = {
+  charactersClasses: ClassType[];
+  races: RaceType[];
+};
+
+const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedRace, setSelectedRace] = useState("");
+
+  const changeSelectedClass = (value: string) => {
+    setSelectedClass(value);
+  };
+
+  const changeSelectedRace = (value: string) => {
+    setSelectedRace(value);
+  };
   const characterStatistics = [
     { statisticName: "Vie", value: 18, maxComparedToOthersCharacters: 21 },
     { statisticName: "Attaque", value: 30, maxComparedToOthersCharacters: 35 },
@@ -15,6 +33,8 @@ const IntroductionParagraph = () => {
     { statisticName: "Esquive", value: 21, maxComparedToOthersCharacters: 35 },
   ];
 
+  // const characterStatistics = calculateCharacterStatistics({ characterClassId: "" , level: 1});
+
   return (
     <>
       <H2 id="introduction-paragraph">Introduction</H2>
@@ -22,9 +42,17 @@ const IntroductionParagraph = () => {
       <HorizontalSpacing horizontalPadding="12px" />
       <div className="flex items-center gap-2 flex-wrap">
         <p>Je veux être un</p>
-        <ClassSelect />
+        <ClassSelect
+          selectedClass={selectedClass}
+          handleChangeSelectedClass={changeSelectedClass}
+          charactersClasses={charactersClasses}
+        />
         <p>de la race</p>
-        <RaceSelect />
+        <RaceSelect
+          selectedRace={selectedRace}
+          handleChangeSelectedRace={changeSelectedRace}
+          races={races}
+        />
       </div>
       <HorizontalSpacing horizontalPadding="2px" />
       <p> Statistiques au niveau 1 :</p>

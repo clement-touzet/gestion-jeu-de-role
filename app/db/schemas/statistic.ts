@@ -9,6 +9,9 @@ export const StatisticTable = pgTable("statistic", {
   description: varchar("description", { length: 1000 }),
 });
 
+export type StatisticType = typeof StatisticTable.$inferSelect;
+export type InsertStatisticType = typeof StatisticTable.$inferInsert;
+
 // many to many relation with "class_satistic_modifier" table
 export const StatisticTableRelations = relations(
   StatisticTable,

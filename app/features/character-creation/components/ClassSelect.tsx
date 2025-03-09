@@ -1,3 +1,4 @@
+"use client";
 import {
   Select,
   SelectContent,
@@ -7,17 +8,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
-import { db } from "@/app/db";
-import { ClassTable, ClassType } from "@/app/db/schemas";
-import { asc } from "drizzle-orm";
+import { ClassType } from "@/app/db/schemas";
 
-const ClassSelect = async () => {
-  const charactersClasses: ClassType[] = await db.query.ClassTable.findMany({
-    orderBy: [asc(ClassTable.name)],
-  });
+type Props = {
+  selectedClass: ClassType["name"];
+  handleChangeSelectedClass: (value: ClassType["name"]) => void;
+  charactersClasses: ClassType[];
+};
+
+const ClassSelect = ({
+  selectedClass,
+  handleChangeSelectedClass,
+  charactersClasses,
+}: Props) => {
+  // const charactersClasses = [{ id: "test", name: "test" }];
 
   return (
-    <Select>
+    <Select value={selectedClass} onValueChange={handleChangeSelectedClass}>
       <SelectTrigger className="w-[220px]">
         <SelectValue placeholder="Sélectionner une classe" />
       </SelectTrigger>

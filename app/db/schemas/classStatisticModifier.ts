@@ -17,6 +17,11 @@ export const ClassStatisticModifierTable = pgTable(
   }
 );
 
+export type ClassStatisticModifierTableType =
+  typeof ClassStatisticModifierTable.$inferSelect;
+export type InsertClassStatisticModifierTableType =
+  typeof ClassStatisticModifierTable.$inferInsert;
+
 // many to many relation with "statistic" table
 export const ClassStatisticModifierTableRelations = relations(
   ClassStatisticModifierTable,

@@ -9,6 +9,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/app/components/ui/sidebar";
+import { getClassesByAsc } from "@/app/features/character-creation/actions/getClasses";
+import { getRacesByAsc } from "@/app/features/character-creation/actions/getRaces";
 import IntroductionParagraph from "@/app/features/tutorials/getting-started/IntroductionParagraph";
 import React from "react";
 
@@ -23,7 +25,10 @@ const items: NavMainItemsType = [
   },
 ];
 
-const GettingStartedPage = () => {
+const GettingStartedPage = async () => {
+  const charactersClasses = await getClassesByAsc();
+  const races = await getRacesByAsc();
+
   return (
     <>
       <SidebarProvider>
@@ -35,7 +40,10 @@ const GettingStartedPage = () => {
         <SidebarInset>
           <SidebarTrigger className="-ml-1 mt-6" />
           <main className="px-8 h-m-80svh">
-            <IntroductionParagraph />
+            <IntroductionParagraph
+              charactersClasses={charactersClasses}
+              races={races}
+            />
           </main>
         </SidebarInset>
       </SidebarProvider>
