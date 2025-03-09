@@ -1,0 +1,28 @@
+const charactersRaces = [
+  "Arkan Sonney",
+  "Aknade",
+  "Brumecendre",
+  "Draconien",
+  "Dryade",
+  "Ellub",
+  "Ellulu",
+  "Evaros",
+  "Feliarea",
+  "Gaueko",
+  "Géant",
+  "Gobelin",
+  "Semi-homme",
+  "Humain (Xaldien/Varentien)",
+  "Igarbam (homme-loutre)",
+  "Korrigan",
+  "Lamina",
+  "Léviathid",
+  "Nain",
+  "Ogre bleu",
+  "Orc",
+  "Séraphin",
+  "Subo",
+  "Vaggatede",
+];
+
+export default charactersRaces;
