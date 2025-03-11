@@ -9,7 +9,7 @@ const Navbar = () => {
   return (
     <>
       <div className="flex items-center justify-between px-4 lg:px-20 py-1 w-full navbar-height">
-        <H1 className="h1 font-bold text-xl"> Gestion de JDR</H1>
+        <H1 className="h1 font-bold text-xl"> Ombres & Légendes</H1>
 
         <NavigationItems className="hidden md:flex " />
         <NavigationDialog />
