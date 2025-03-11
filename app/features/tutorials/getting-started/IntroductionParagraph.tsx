@@ -59,6 +59,9 @@ const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
       <CharacterStatisticsRadarChart
         characterStatistics={characterStatistics}
       />
+
+      {/* montrer les caractéristiques de base possibles à améliorer */}
+      <p> TODO MONTRER LES CARACTERISTIQUES DE BASE POSSIBLE A CHANGER</p>
     </>
   );
 };

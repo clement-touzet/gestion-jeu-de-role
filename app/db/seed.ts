@@ -7,12 +7,18 @@ import * as schema from "./schemas";
 import { charactersStatistics } from "@/app/features/character-creation/constants/charactersStatistics";
 import { classStatisticsModifiers } from "@/app/features/character-creation/constants/classStatisticsModifiers";
 import { insertClassStatModifier } from "@/app/features/character-creation/actions/insertClassStatModifier";
+import { racesCaracteristics } from "@/app/features/character-creation/constants/racesCaracteristics";
+import {
+  insertCaracteristics,
+  insertCaracteristicsType,
+} from "@/app/features/character-creation/actions/insertCaracteristics";
+import { insertBaseCaracteristicsEffects } from "@/app/features/character-creation/actions/insertBaseCaracteristicsEffects";
 
 async function main() {
   console.log("seeding started !");
 
   console.log("\n");
-  console.log("===resetting database !===");
+  console.log("===reseting database !===");
   await reset(db, schema);
 
   console.log("\n");
@@ -52,10 +58,16 @@ async function main() {
       for (const modifier of classStatisticsModifiers[characterClass][
         stat.name
       ]) {
-        console.log("---- inserting ", modifier.level, modifier.statisticValue);
+        console.log(
+          "---- inserting. Level :",
+          modifier.level,
+          stat.name,
+          ":",
+          modifier.statisticValue
+        );
 
         // pour chaque modification a faire
-        await insertClassStatModifier({
+        insertClassStatModifier({
           classId: insertedClass.id,
           level: modifier.level,
           statisticId: stat.id,
@@ -67,29 +79,75 @@ async function main() {
 
   console.log("\n");
   console.log("====inserting races====");
+  const insertedRaces = [];
   for (const race of charactersRaces) {
-    console.log("inserting", race);
-    await db.insert(RaceTable).values({
-      name: race,
-    });
+    const name = race.name;
+    console.log("inserting", name);
+    const result = (
+      await db
+        .insert(RaceTable)
+        .values({
+          name,
+        })
+        .returning()
+    )[0];
+    insertedRaces.push(result);
   }
 
-  const characterClass = await db.query.ClassTable.findFirst();
-  if (characterClass === undefined)
-    throw new Error("pas de classe trouvée, faut changer ça.");
+  console.log("====inserting races characteristics====");
+  const insertedCaracteristics: schema.Caracteristic[] = [];
+  for (const characteristicType in racesCaracteristics) {
+    const insertedCaracteristicType = (
+      await insertCaracteristicsType([
+        {
+          name: racesCaracteristics[characteristicType].label,
+        },
+      ])
+    )[0];
+    console.log(
+      "- inserted caracteristic type : ",
+      racesCaracteristics[characteristicType].label
+    );
 
-  // const insertedClassSatisticModifier = await db
-  //   .insert(ClassStatisticModifierTable)
-  //   .values({
-  //     statisticValue: 10,
-  //     level: 1,
-  //     characterClassId: characterClass.id,
-  //   })
-  //   .returning();
-  // await db.insert(StatisticToClassStatisticModifierTable).values({
-  //   classStatisticModifierId: insertedClassSatisticModifier[0].id,
-  //   statisticId: lifeStat.id,
-  // });
+    const caracteristics =
+      racesCaracteristics[characteristicType].caracteristics;
+    for (const currentCaracteristic of caracteristics) {
+      console.log("-- inserted caracteristic : ", currentCaracteristic);
+      const result = await insertCaracteristics([
+        {
+          name: currentCaracteristic,
+          caracteristicTypeId: insertedCaracteristicType.id,
+        },
+      ]);
+      insertedCaracteristics.push(result[0]);
+    }
+  }
+
+  console.log("====inserting races base characteristics====");
+  for (const insertedRace of insertedRaces) {
+    console.log("- inserting base caracteristics effets");
+    const raceFound = charactersRaces.find(
+      (item) => item.name === insertedRace.name
+    );
+    const caracteristicsEffect = raceFound?.baseCaracteristicsEffects;
+    if (caracteristicsEffect === undefined) continue;
+
+    for (const effect of caracteristicsEffect) {
+      const caracteristicFound = insertedCaracteristics.find(
+        (item) => item.name === effect.name
+      );
+      if (caracteristicFound === undefined) continue;
+      console.log("-- inserting base caracteristic effet :", effect.name);
+
+      await insertBaseCaracteristicsEffects([
+        {
+          effectType: effect.effectType,
+          caracteristicId: caracteristicFound.id,
+          raceId: insertedRace.id,
+        },
+      ]);
+    }
+  }
 
   console.log("\n");
   console.log("seeding finished !");

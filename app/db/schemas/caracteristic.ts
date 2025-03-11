@@ -24,3 +24,8 @@ export const CaracteristicRelations = relations(
     }),
   })
 );
+
+// === TYPES ===
+
+export type Caracteristic = typeof CaracteristicTable.$inferSelect;
+export type InsertCaracteristic = typeof CaracteristicTable.$inferInsert;

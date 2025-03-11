@@ -33,3 +33,10 @@ export const BaseCaracteristicEffectRelation = relations(
     }),
   })
 );
+
+// === TYPES ===
+
+export type BaseCaracteristicEffectType =
+  typeof BaseCaracteristicEffectTable.$inferSelect;
+export type InsertBaseCaracteristicEffectType =
+  typeof BaseCaracteristicEffectTable.$inferInsert;

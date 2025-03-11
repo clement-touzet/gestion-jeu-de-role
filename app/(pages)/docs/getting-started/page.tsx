@@ -38,7 +38,9 @@ const GettingStartedPage = async () => {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <SidebarTrigger className="-ml-1 mt-6" />
+          <div className="fixed">
+            <SidebarTrigger className="-ml-1 mt-6 sticky top-0 left-0" />
+          </div>
           <main className="px-8 h-m-80svh">
             <IntroductionParagraph
               charactersClasses={charactersClasses}
