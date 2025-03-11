@@ -1,4 +1,4 @@
-import { StatisticToClassStatisticModifierTable } from "@/app/db/schemas/classStatisticModifier";
+import { StatisticToClassStatisticModifierTable } from "@/app/db/schemas/statisticToClassStatisticModifier";
 import { relations } from "drizzle-orm";
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 

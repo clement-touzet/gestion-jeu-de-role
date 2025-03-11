@@ -1,14 +1,14 @@
-import React from "react";
+"use client";
 
-const H2 = ({
+const H1 = ({
   children,
   ...props
 }: { children: string } & React.HtmlHTMLAttributes<HTMLHeadingElement>) => {
   return (
-    <h2 className="h2 font-bold text-xl" {...props}>
+    <h1 className="h1 font-bold text-xl" {...props}>
       {children}
-    </h2>
+    </h1>
   );
 };
 
-export default H2;
+export default H1;
