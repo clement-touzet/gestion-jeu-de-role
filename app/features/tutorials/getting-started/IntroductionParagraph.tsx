@@ -6,6 +6,7 @@ import { ClassType, RaceType } from "@/app/db/schemas";
 import { CharacterStatisticsRadarChart } from "@/app/features/character-creation/components/CharacterStatisticsRadarChart";
 import ClassSelect from "@/app/features/character-creation/components/ClassSelect";
 import RaceSelect from "@/app/features/character-creation/components/RaceSelect";
+import CaracteristicPointsSection from "@/app/features/character-creation/components/sections/CaracteristicPointsSection";
 import React, { useState } from "react";
 
 type Props = {
@@ -15,14 +16,16 @@ type Props = {
 
 const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
   const [selectedClass, setSelectedClass] = useState("");
-  const [selectedRace, setSelectedRace] = useState("");
+  const [selectedRaceId, setSelectedRaceId] = useState<
+    RaceType["id"] | undefined
+  >(undefined);
 
   const changeSelectedClass = (value: string) => {
     setSelectedClass(value);
   };
 
-  const changeSelectedRace = (value: string) => {
-    setSelectedRace(value);
+  const changeSelectedRace = (value: RaceType["id"]) => {
+    setSelectedRaceId(value);
   };
   const characterStatistics = [
     { statisticName: "Vie", value: 18, maxComparedToOthersCharacters: 21 },
@@ -49,8 +52,8 @@ const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
         />
         <p>de la race</p>
         <RaceSelect
-          selectedRace={selectedRace}
-          handleChangeSelectedRace={changeSelectedRace}
+          selectedRaceId={selectedRaceId}
+          handleChangeSelectedRaceId={changeSelectedRace}
           races={races}
         />
       </div>
@@ -61,7 +64,9 @@ const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
       />
 
       {/* montrer les caractéristiques de base possibles à améliorer */}
-      <p> TODO MONTRER LES CARACTERISTIQUES DE BASE POSSIBLE A CHANGER</p>
+      {selectedRaceId ? (
+        <CaracteristicPointsSection raceId={selectedRaceId} />
+      ) : null}
     </>
   );
 };

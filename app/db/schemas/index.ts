@@ -4,7 +4,6 @@ export * from "./enums";
 
 export * from "./baseCaracteristicEffect";
 export * from "./caracteristic";
-export * from "./caracteristicType";
 export * from "./character";
 export * from "./class";
 export * from "./classStatisticModifier";

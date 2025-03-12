@@ -8,11 +8,9 @@ import { charactersStatistics } from "@/app/features/character-creation/constant
 import { classStatisticsModifiers } from "@/app/features/character-creation/constants/classStatisticsModifiers";
 import { insertClassStatModifier } from "@/app/features/character-creation/actions/insertClassStatModifier";
 import { racesCaracteristics } from "@/app/features/character-creation/constants/racesCaracteristics";
-import {
-  insertCaracteristics,
-  insertCaracteristicsType,
-} from "@/app/features/character-creation/actions/insertCaracteristics";
+import { insertCaracteristics } from "@/app/features/character-creation/actions/insertCaracteristics";
 import { insertBaseCaracteristicsEffects } from "@/app/features/character-creation/actions/insertBaseCaracteristicsEffects";
+import { CaracteriticsTypes } from "@/app/db/schemas/enums/caracteristicTypesEnum";
 
 async function main() {
   console.log("seeding started !");
@@ -81,13 +79,14 @@ async function main() {
   console.log("====inserting races====");
   const insertedRaces = [];
   for (const race of charactersRaces) {
-    const name = race.name;
-    console.log("inserting", name);
+    console.log("inserting", race.name);
     const result = (
       await db
         .insert(RaceTable)
         .values({
-          name,
+          name: race.name,
+          baseCaracteristicBonusPoints: race.bonusPoints,
+          baseCaracteristicPenaltyPoints: race.penaltyPoints,
         })
         .returning()
     )[0];
@@ -95,35 +94,34 @@ async function main() {
   }
 
   console.log("====inserting races characteristics====");
-  const insertedCaracteristics: schema.Caracteristic[] = [];
-  for (const characteristicType in racesCaracteristics) {
-    const insertedCaracteristicType = (
-      await insertCaracteristicsType([
-        {
-          name: racesCaracteristics[characteristicType].label,
-        },
-      ])
-    )[0];
+  const insertedCaracteristics: schema.CaracteristicType[] = [];
+  let characteristicType: CaracteriticsTypes;
+  for (characteristicType in racesCaracteristics) {
     console.log(
-      "- inserted caracteristic type : ",
+      "- inserting caracteristic type : ",
       racesCaracteristics[characteristicType].label
     );
 
-    const caracteristics =
-      racesCaracteristics[characteristicType].caracteristics;
-    for (const currentCaracteristic of caracteristics) {
-      console.log("-- inserted caracteristic : ", currentCaracteristic);
-      const result = await insertCaracteristics([
+    for (const characteristic of racesCaracteristics[characteristicType]
+      .caracteristics) {
+      console.log(
+        "-- inserting caracteristic : ",
+        characteristic,
+        characteristicType
+      );
+      const characteristicToInsert: schema.InsertCaracteristicType[] = [
         {
-          name: currentCaracteristic,
-          caracteristicTypeId: insertedCaracteristicType.id,
+          name: characteristic,
+          caracteristicType: characteristicType,
         },
-      ]);
+      ];
+      const result = await insertCaracteristics(characteristicToInsert);
+      console.log("inserted", result);
       insertedCaracteristics.push(result[0]);
     }
   }
 
-  console.log("====inserting races base characteristics====");
+  console.log("==== inserting races base characteristics effects ====");
   for (const insertedRace of insertedRaces) {
     console.log("- inserting base caracteristics effets");
     const raceFound = charactersRaces.find(

@@ -1,23 +1,9 @@
 "use server";
 import { db } from "@/app/db";
-import {
-  CaracteristicTable,
-  CaracteristicTypeTable,
-  InsertCaracteristic,
-  InsertCaracteristicType,
-} from "@/app/db/schemas";
-
-export const insertCaracteristicsType = async (
-  caracteristicsTypes: InsertCaracteristicType[]
-) => {
-  return await db
-    .insert(CaracteristicTypeTable)
-    .values(caracteristicsTypes)
-    .returning();
-};
+import { CaracteristicTable, InsertCaracteristicType } from "@/app/db/schemas";
 
 export const insertCaracteristics = async (
-  caracteristic: InsertCaracteristic[]
+  caracteristic: InsertCaracteristicType[]
 ) => {
   return await db.insert(CaracteristicTable).values(caracteristic).returning();
 };

@@ -14,7 +14,7 @@ export const BaseCaracteristicEffectTable = pgTable(
     raceId: uuid("race_id")
       .notNull()
       .references(() => RaceTable.id),
-    effectType: BaseCaracteristicEffectTypesEnum(),
+    effectType: BaseCaracteristicEffectTypesEnum().notNull(),
   }
 );
 

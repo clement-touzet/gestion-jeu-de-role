@@ -12,14 +12,14 @@ import { RaceType } from "@/app/db/schemas";
 import React from "react";
 
 type Props = {
-  selectedRace: RaceType["name"];
-  handleChangeSelectedRace: (value: RaceType["name"]) => void;
+  selectedRaceId: RaceType["id"] | undefined;
+  handleChangeSelectedRaceId: (value: RaceType["id"]) => void;
   races: RaceType[];
 };
 
 const RaceSelect = ({
-  selectedRace,
-  handleChangeSelectedRace,
+  selectedRaceId,
+  handleChangeSelectedRaceId,
   races,
 }: Props) => {
   // const races: RaceType[] = await db.query.RaceTable.findMany({
@@ -27,7 +27,7 @@ const RaceSelect = ({
   // });
 
   return (
-    <Select value={selectedRace} onValueChange={handleChangeSelectedRace}>
+    <Select value={selectedRaceId} onValueChange={handleChangeSelectedRaceId}>
       <SelectTrigger className="w-[220px]">
         <SelectValue placeholder="Sélectionner une race" />
       </SelectTrigger>

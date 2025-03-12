@@ -8,6 +8,5 @@ export const getRacesByAsc = async () => {
   const result = await db.query.RaceTable.findMany({
     orderBy: [asc(RaceTable.name)],
   });
-  console.log("races: ", result);
   return result;
 };
