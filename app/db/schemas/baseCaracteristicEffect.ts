@@ -10,10 +10,10 @@ export const BaseCaracteristicEffectTable = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     caracteristicId: uuid("caracteristic_id")
       .notNull()
-      .references(() => CaracteristicTable.id),
+      .references(() => CaracteristicTable.id, { onDelete: "cascade" }),
     raceId: uuid("race_id")
       .notNull()
-      .references(() => RaceTable.id),
+      .references(() => RaceTable.id, { onDelete: "cascade" }),
     effectType: BaseCaracteristicEffectTypesEnum().notNull(),
   }
 );

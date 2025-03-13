@@ -1,29 +1,35 @@
 import { RaceTable } from "@/app/db/schemas/race";
-import { StatisticToRaceStatisticModifierTable } from "@/app/db/schemas/statisticToRaceStatisticModifier";
+import { StatisticModifierTable } from "@/app/db/schemas/statisticModifier";
 import { relations } from "drizzle-orm";
-import { integer, pgTable, uuid } from "drizzle-orm/pg-core";
+import { pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
 
-export const RaceStatisticModifierTable = pgTable("race_statisitic_modifier", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  raceId: uuid("race_id")
-    .notNull()
-    .references(() => RaceTable.id),
-  statisticValue: integer().notNull(),
-  level: integer().notNull(),
-});
+export const RaceStatisticModifierTable = pgTable(
+  "race_statistic_modifier",
+  {
+    statisticModifierId: uuid("statistic_modifier_id")
+      .notNull()
+      .references(() => StatisticModifierTable.id, { onDelete: "cascade" }),
+    raceId: uuid("race_id")
+      .notNull()
+      .references(() => RaceTable.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.raceId, table.statisticModifierId] }),
+  ]
+);
 
 // === RELATIONS ===
 
-// many to many relation with "statistic" table
 export const RaceStatisticModifierTableRelations = relations(
   RaceStatisticModifierTable,
-  ({ many, one }) => ({
-    statisticToRaceStatisticModifier: many(
-      StatisticToRaceStatisticModifierTable
-    ),
+  ({ one }) => ({
     race: one(RaceTable, {
       fields: [RaceStatisticModifierTable.raceId],
       references: [RaceTable.id],
+    }),
+    statisticModifier: one(StatisticModifierTable, {
+      fields: [RaceStatisticModifierTable.statisticModifierId],
+      references: [StatisticModifierTable.id],
     }),
   })
 );

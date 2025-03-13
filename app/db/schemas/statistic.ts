@@ -1,4 +1,4 @@
-import { StatisticToClassStatisticModifierTable } from "@/app/db/schemas/statisticToClassStatisticModifier";
+import { StatisticModifierTable } from "@/app/db/schemas/statisticModifier";
 import { relations } from "drizzle-orm";
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 
@@ -16,8 +16,6 @@ export type InsertStatisticType = typeof StatisticTable.$inferInsert;
 export const StatisticTableRelations = relations(
   StatisticTable,
   ({ many }) => ({
-    statisticToClassStatisticModifier: many(
-      StatisticToClassStatisticModifierTable
-    ),
+    statisticModifier: many(StatisticModifierTable),
   })
 );

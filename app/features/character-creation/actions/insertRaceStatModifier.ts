@@ -5,15 +5,16 @@ import {
   RaceStatisticModifierTable,
   RaceStatisticModifierTableType,
   RaceType,
-  StatisticToRaceStatisticModifierTable,
+  StatisticModifierTable,
+  StatisticModifierType,
   StatisticType,
 } from "@/app/db/schemas";
 
 type insertRaceStatModifierProps = {
   statisticId: StatisticType["id"];
   raceId: RaceType["id"];
-  level: RaceStatisticModifierTableType["level"];
-  statisticValue: RaceStatisticModifierTableType["statisticValue"];
+  level: StatisticModifierType["level"];
+  statisticValue: StatisticModifierType["statisticValue"];
 };
 
 // RaceId : the Race id of the Race to add the stat modifier
@@ -23,17 +24,20 @@ export const insertRaceStatModifier = async ({
   level,
   statisticValue,
 }: insertRaceStatModifierProps): Promise<RaceStatisticModifierTableType[]> => {
+  const insertedModifier = await db
+    .insert(StatisticModifierTable)
+    .values({
+      level,
+      statisticId,
+      statisticValue,
+    })
+    .returning();
   const insertedRaceSatisticModifier = await db
     .insert(RaceStatisticModifierTable)
     .values({
-      statisticValue: statisticValue,
-      level: level,
-      raceId: raceId,
+      raceId,
+      statisticModifierId: insertedModifier[0].id,
     })
     .returning();
-  await db.insert(StatisticToRaceStatisticModifierTable).values({
-    raceStatisticModifierId: insertedRaceSatisticModifier[0].id,
-    statisticId: statisticId,
-  });
   return insertedRaceSatisticModifier;
 };

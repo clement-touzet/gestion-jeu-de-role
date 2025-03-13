@@ -1,14 +1,14 @@
 import {
   ClassType,
-  InsertClassStatisticModifierTableType,
+  InsertStatisticModifierType,
   StatisticType,
 } from "@/app/db/schemas";
 
 export const classStatisticsModifiers: {
   [x: ClassType["name"]]: {
     [x: StatisticType["name"]]: Omit<
-      InsertClassStatisticModifierTableType,
-      "characterClassId"
+      InsertStatisticModifierType,
+      "statisticId"
     >[];
   };
 } = {

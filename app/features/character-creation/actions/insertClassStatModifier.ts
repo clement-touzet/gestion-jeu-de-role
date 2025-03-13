@@ -5,15 +5,16 @@ import {
   ClassStatisticModifierTable,
   ClassStatisticModifierTableType,
   ClassType,
-  StatisticToClassStatisticModifierTable,
+  StatisticModifierTable,
+  StatisticModifierType,
   StatisticType,
 } from "@/app/db/schemas";
 
 type insertClassStatModifierProps = {
   statisticId: StatisticType["id"];
   classId: ClassType["id"];
-  level: ClassStatisticModifierTableType["level"];
-  statisticValue: ClassStatisticModifierTableType["statisticValue"];
+  level: StatisticModifierType["level"];
+  statisticValue: StatisticModifierType["statisticValue"];
 };
 
 // classId : the class id of the class to add the stat modifier
@@ -25,17 +26,21 @@ export const insertClassStatModifier = async ({
 }: insertClassStatModifierProps): Promise<
   ClassStatisticModifierTableType[]
 > => {
+  const insertedModifier = await db
+    .insert(StatisticModifierTable)
+    .values({
+      statisticId: statisticId,
+      level,
+      statisticValue,
+    })
+    .returning();
   const insertedClassSatisticModifier = await db
     .insert(ClassStatisticModifierTable)
     .values({
-      statisticValue: statisticValue,
-      level: level,
       characterClassId: classId,
+      statisticModifierId: insertedModifier[0].id,
     })
     .returning();
-  await db.insert(StatisticToClassStatisticModifierTable).values({
-    classStatisticModifierId: insertedClassSatisticModifier[0].id,
-    statisticId: statisticId,
-  });
+
   return insertedClassSatisticModifier;
 };
