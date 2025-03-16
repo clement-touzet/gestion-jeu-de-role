@@ -1,6 +1,6 @@
 import { InsertStatisticType } from "@/app/db/schemas";
 
-export const charactersStatistics: InsertStatisticType[] = [
+export const statistics: InsertStatisticType[] = [
   {
     name: "life",
     unit: "HP",

@@ -5,7 +5,7 @@ const H1 = ({
   ...props
 }: { children: string } & React.HtmlHTMLAttributes<HTMLHeadingElement>) => {
   return (
-    <h1 className="h1 font-bold text-xl" {...props}>
+    <h1 className="h1 font-bold text-3xl" {...props}>
       {children}
     </h1>
   );

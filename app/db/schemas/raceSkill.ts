@@ -1,5 +1,5 @@
 import { RaceTable } from "@/app/db/schemas/race";
-import { SkillByLevelTable } from "@/app/db/schemas/skillByLevel";
+import { SkillTable } from "@/app/db/schemas/skill";
 import { relations } from "drizzle-orm";
 import { pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
 
@@ -9,19 +9,19 @@ export const RaceSkillTable = pgTable(
     raceId: uuid("race_id")
       .notNull()
       .references(() => RaceTable.id, { onDelete: "cascade" }),
-    skillByLevelId: uuid("skill_by_level_id")
+    skillId: uuid("skill_id")
       .notNull()
-      .references(() => SkillByLevelTable.id, { onDelete: "cascade" }),
+      .references(() => SkillTable.id, { onDelete: "cascade" }),
   },
-  (table) => [primaryKey({ columns: [table.raceId, table.skillByLevelId] })]
+  (table) => [primaryKey({ columns: [table.raceId, table.skillId] })]
 );
 
 export const RaceSkillRelations = relations(RaceSkillTable, ({ one }) => ({
-  skillsByLevel: one(SkillByLevelTable, {
-    fields: [RaceSkillTable.skillByLevelId],
-    references: [SkillByLevelTable.id],
+  skill: one(SkillTable, {
+    fields: [RaceSkillTable.skillId],
+    references: [SkillTable.id],
   }),
-  races: one(RaceTable, {
+  race: one(RaceTable, {
     fields: [RaceSkillTable.raceId],
     references: [RaceTable.id],
   }),

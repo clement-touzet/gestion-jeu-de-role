@@ -1,5 +1,5 @@
 import { ClassTable } from "@/app/db/schemas/class";
-import { SkillByLevelTable } from "@/app/db/schemas/skillByLevel";
+import { SkillTable } from "@/app/db/schemas/skill";
 import { relations } from "drizzle-orm";
 import { pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
 
@@ -11,19 +11,19 @@ export const ClassSkillTable = pgTable(
       .references(() => ClassTable.id, {
         onDelete: "cascade",
       }),
-    skillByLevelId: uuid("skill_by_level_id")
+    skillId: uuid("skill_id")
       .notNull()
-      .references(() => SkillByLevelTable.id, { onDelete: "cascade" }),
+      .references(() => SkillTable.id, { onDelete: "cascade" }),
   },
-  (table) => [primaryKey({ columns: [table.classId, table.skillByLevelId] })]
+  (table) => [primaryKey({ columns: [table.classId, table.skillId] })]
 );
 
 export const ClassSkillRelations = relations(ClassSkillTable, ({ one }) => ({
-  skillsByLevel: one(SkillByLevelTable, {
-    fields: [ClassSkillTable.skillByLevelId],
-    references: [SkillByLevelTable.id],
+  skill: one(SkillTable, {
+    fields: [ClassSkillTable.skillId],
+    references: [SkillTable.id],
   }),
-  class: one(ClassTable, {
+  characterClass: one(ClassTable, {
     fields: [ClassSkillTable.classId],
     references: [ClassTable.id],
   }),

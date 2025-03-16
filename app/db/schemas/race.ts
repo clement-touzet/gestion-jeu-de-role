@@ -1,4 +1,5 @@
 import { BaseCaracteristicEffectTable } from "@/app/db/schemas/baseCaracteristicEffect";
+import { RaceSkillTable } from "@/app/db/schemas/raceSkill";
 import { RaceStatisticModifierTable } from "@/app/db/schemas/raceStatisticModifier";
 import { relations, sql } from "drizzle-orm";
 import { check, integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
@@ -32,6 +33,7 @@ export const RaceTable = pgTable(
 export const RaceRelations = relations(RaceTable, ({ many }) => ({
   baseCaracteristicEffect: many(BaseCaracteristicEffectTable),
   raceStatisticModifier: many(RaceStatisticModifierTable),
+  raceSkills: many(RaceSkillTable),
 }));
 
 export type RaceType = typeof RaceTable.$inferSelect;

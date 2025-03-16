@@ -11,8 +11,8 @@ import {
 import { ClassType } from "@/app/db/schemas";
 
 type Props = {
-  selectedClass: ClassType["name"];
-  handleChangeSelectedClass: (value: ClassType["name"]) => void;
+  selectedClass: ClassType["id"] | undefined;
+  handleChangeSelectedClass: (value: ClassType["id"]) => void;
   charactersClasses: ClassType[];
 };
 

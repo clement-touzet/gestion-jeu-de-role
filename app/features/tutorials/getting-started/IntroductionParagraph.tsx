@@ -2,11 +2,14 @@
 
 import H2 from "@/app/components/ui/H2";
 import HorizontalSpacing from "@/app/components/ui/horizontal-spacing";
+import Section from "@/app/components/ui/Section";
 import { ClassType, RaceType } from "@/app/db/schemas";
 import { CharacterStatisticsRadarChart } from "@/app/features/character-creation/components/CharacterStatisticsRadarChart";
 import ClassSelect from "@/app/features/character-creation/components/ClassSelect";
 import RaceSelect from "@/app/features/character-creation/components/RaceSelect";
 import CaracteristicPointsSection from "@/app/features/character-creation/components/sections/CaracteristicPointsSection";
+import ClassSkillsSection from "@/app/features/character-creation/components/sections/ClassSkillsSection";
+import RaceSkillsSection from "@/app/features/character-creation/components/sections/RaceSkillsSection";
 import React, { useState } from "react";
 
 type Props = {
@@ -15,13 +18,15 @@ type Props = {
 };
 
 const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState<
+    RaceType["id"] | undefined
+  >(undefined);
   const [selectedRaceId, setSelectedRaceId] = useState<
     RaceType["id"] | undefined
   >(undefined);
 
-  const changeSelectedClass = (value: string) => {
-    setSelectedClass(value);
+  const changeSelectedClass = (value: ClassType["id"]) => {
+    setSelectedClassId(value);
   };
 
   const changeSelectedRace = (value: RaceType["id"]) => {
@@ -40,28 +45,41 @@ const IntroductionParagraph = ({ charactersClasses, races }: Props) => {
 
   return (
     <>
-      <H2 id="introduction-paragraph">Introduction</H2>
+      <Section>
+        <H2 id="introduction-paragraph">Introduction</H2>
 
-      <HorizontalSpacing horizontalPadding="12px" />
-      <div className="flex items-center gap-2 flex-wrap">
-        <p>Je veux être un</p>
-        <ClassSelect
-          selectedClass={selectedClass}
-          handleChangeSelectedClass={changeSelectedClass}
-          charactersClasses={charactersClasses}
+        <HorizontalSpacing horizontalPadding="12px" />
+        <div className="flex items-center gap-2 flex-wrap">
+          <p>Je veux être un</p>
+          <ClassSelect
+            selectedClass={selectedClassId}
+            handleChangeSelectedClass={changeSelectedClass}
+            charactersClasses={charactersClasses}
+          />
+          <p>de la race</p>
+          <RaceSelect
+            selectedRaceId={selectedRaceId}
+            handleChangeSelectedRaceId={changeSelectedRace}
+            races={races}
+          />
+        </div>
+        <HorizontalSpacing horizontalPadding="2px" />
+        <p> Statistiques au niveau 1 :</p>
+        <CharacterStatisticsRadarChart
+          characterStatistics={characterStatistics}
         />
-        <p>de la race</p>
-        <RaceSelect
-          selectedRaceId={selectedRaceId}
-          handleChangeSelectedRaceId={changeSelectedRace}
-          races={races}
+      </Section>
+
+      {selectedClassId ? (
+        <ClassSkillsSection
+          classId={selectedClassId}
+          classes={charactersClasses}
         />
-      </div>
-      <HorizontalSpacing horizontalPadding="2px" />
-      <p> Statistiques au niveau 1 :</p>
-      <CharacterStatisticsRadarChart
-        characterStatistics={characterStatistics}
-      />
+      ) : null}
+
+      {selectedRaceId ? (
+        <RaceSkillsSection raceId={selectedRaceId} races={races} />
+      ) : null}
 
       {/* montrer les caractéristiques de base possibles à améliorer */}
       {selectedRaceId ? (

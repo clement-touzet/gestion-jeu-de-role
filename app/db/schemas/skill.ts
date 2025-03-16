@@ -1,3 +1,5 @@
+import { ClassSkillTable } from "@/app/db/schemas/classSkill";
+import { RaceSkillTable } from "@/app/db/schemas/raceSkill";
 import { SkillByLevelTable } from "@/app/db/schemas/skillByLevel";
 import { relations } from "drizzle-orm";
 import { integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
@@ -11,8 +13,10 @@ export const SkillTable = pgTable("skill", {
   mystheraCost: integer("mysthera_cost").notNull(),
 });
 
-export const SkillRelations = relations(SkillTable, ({ many }) => ({
+export const SkillRelations = relations(SkillTable, ({ many, one }) => ({
   skillsByLevel: many(SkillByLevelTable),
+  classSkill: one(ClassSkillTable),
+  raceSkill: one(RaceSkillTable),
 }));
 
 export type SkillType = typeof SkillTable.$inferSelect;

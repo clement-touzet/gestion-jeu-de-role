@@ -1,22 +1,20 @@
 import { db } from "@/app/db";
-import { ClassTable, RaceTable, StatisticTable } from "@/app/db/schemas";
-import charactersClasses from "@/app/features/character-creation/constants/charactersClasses";
-import charactersRaces from "@/app/features/character-creation/constants/charactersRaces";
+import { RaceTable, StatisticTable } from "@/app/db/schemas";
+import charactersRaces from "@/app/features/character-creation/constants/characterRaces";
 import { reset } from "drizzle-seed";
 import * as schema from "./schemas";
-import { charactersStatistics } from "@/app/features/character-creation/constants/charactersStatistics";
-import { classStatisticsModifiers } from "@/app/features/character-creation/constants/classStatisticsModifiers";
+import { statistics } from "@/app/features/character-creation/constants/charactersStatistics";
 import { insertClassStatModifier } from "@/app/features/character-creation/actions/insertClassStatModifier";
-import { racesCaracteristics } from "@/app/features/character-creation/constants/racesCaracteristics";
+import { racesCaracteristics } from "@/app/features/character-creation/constants/caracteristics";
 import { insertCaracteristics } from "@/app/features/character-creation/actions/insertCaracteristics";
 import { insertBaseCaracteristicsEffects } from "@/app/features/character-creation/actions/insertBaseCaracteristicsEffects";
 import { CaracteriticsTypes } from "@/app/db/schemas/enums/caracteristicTypesEnum";
-import { classSkills } from "@/app/features/character-creation/constants/skills";
+import { classSkills } from "@/app/features/character-creation/constants/characterClasses";
 import {
-  insertClassSkill,
-  insertSkill,
-  insertSkillByLevel,
+  insertRaceSkills,
+  insertClassSkillsByLevels,
 } from "@/app/features/character-creation/actions/insertSkills";
+import { insertClasses } from "@/app/features/character-creation/actions/inserts/insertClasses";
 
 async function main() {
   console.log("seeding started !");
@@ -28,7 +26,7 @@ async function main() {
   console.log("\n");
   console.log("====inserting statistics====");
   const insertedStats: schema.StatisticType[] = [];
-  for (const stat of charactersStatistics) {
+  for (const stat of statistics) {
     console.log("inserting", stat);
     const result = await db
       .insert(StatisticTable)
@@ -42,33 +40,35 @@ async function main() {
   }
 
   console.log("\n");
-  console.log("====inserting classes====");
+  console.log(
+    "====inserting classes and classes skills and classess statistics modifiers===="
+  );
   const insertedClasses: {
     [x: schema.ClassType["name"]]: { id: schema.ClassType["id"] };
   } = {};
-  for (const characterClass of charactersClasses) {
-    // pour chaque classe de charactere
-    console.log("- inserting", characterClass);
-    const insertedClass = (
-      await db
-        .insert(ClassTable)
-        .values({
-          name: characterClass,
-        })
-        .returning()
-    )[0];
 
+  for (const classSkillName of Object.keys(classSkills)) {
+    const { classStatisticsModifiers, skills, ...characterClass } =
+      classSkills[classSkillName];
+
+    console.log("- inserting class ", characterClass.name);
+    const insertedClass = (
+      await insertClasses([
+        {
+          ...characterClass,
+        },
+      ])
+    )[0];
     insertedClasses[insertedClass.name] = { id: insertedClass.id };
 
-    console.log("-- inserting class stats modifiers");
+    console.log("- inserting class's skills  :", classSkillName);
+    await insertClassSkillsByLevels(insertedClass.id, skills);
+
     for (const stat of insertedStats) {
       // pour chaque statistique
-      console.log("--- inserting ", stat.name);
-      for (const modifier of classStatisticsModifiers[characterClass][
-        stat.name
-      ]) {
+      for (const modifier of classStatisticsModifiers[stat.name]) {
         console.log(
-          "---- inserting. Level :",
+          "-- inserting modifier. Level :",
           modifier.level,
           stat.name,
           ":",
@@ -85,55 +85,28 @@ async function main() {
       }
     }
   }
-  console.log("\n");
-  console.log("====inserting class skills====");
-  for (const classSkill of classSkills) {
-    console.log(
-      "- inserting skill '",
-      classSkill.name,
-      "'de la classe",
-      classSkill.class
-    );
-    const classId = insertedClasses[classSkill.class]
-      .id as schema.ClassType["id"];
-    const insertedSkill = (
-      await insertSkill({
-        baseEffectDescription: classSkill.baseEffectDescription,
-        mystheraCost: classSkill.mystheraCost,
-        name: classSkill.name,
-      })
-    )[0];
-    for (const skillByLevel of classSkill.skillByLevels) {
-      console.log("-- inserting skill level :", skillByLevel.level);
-
-      const insertedSkillByLevel = await insertSkillByLevel({
-        level: skillByLevel.level,
-        skillId: insertedSkill.id,
-        effectDescription: skillByLevel.description,
-      });
-      insertClassSkill({
-        classId,
-        skillByLevelId: insertedSkillByLevel[0].id,
-      });
-    }
-  }
 
   console.log("\n");
-  console.log("====inserting races====");
-  const insertedRaces = [];
+  console.log("====inserting races & races skills====");
+  const insertedRaces: {
+    [x: schema.RaceType["name"]]: { id: schema.RaceType["id"] };
+  } = {};
   for (const race of charactersRaces) {
     console.log("inserting", race.name);
-    const result = (
+    const insertedRace = (
       await db
         .insert(RaceTable)
         .values({
           name: race.name,
-          baseCaracteristicBonusPoints: race.bonusPoints,
-          baseCaracteristicPenaltyPoints: race.penaltyPoints,
+          baseCaracteristicBonusPoints: race.baseCaracteristicBonusPoints,
+          baseCaracteristicPenaltyPoints: race.baseCaracteristicPenaltyPoints,
         })
         .returning()
     )[0];
-    insertedRaces.push(result);
+    insertedRaces[insertedRace.name] = { id: insertedRace.id };
+
+    console.log("inserting skills ", race.skills);
+    await insertRaceSkills(insertedRace.id, race.skills);
   }
 
   console.log("\n");
@@ -165,10 +138,10 @@ async function main() {
   }
 
   console.log("==== inserting races base characteristics effects ====");
-  for (const insertedRace of insertedRaces) {
+  for (const insertedRaceName of Object.keys(insertedRaces)) {
     console.log("- inserting base caracteristics effets");
     const raceFound = charactersRaces.find(
-      (item) => item.name === insertedRace.name
+      (item) => item.name === insertedRaceName
     );
     const caracteristicsEffect = raceFound?.baseCaracteristicsEffects;
     if (caracteristicsEffect === undefined) continue;
@@ -184,7 +157,7 @@ async function main() {
         {
           effectType: effect.effectType,
           caracteristicId: caracteristicFound.id,
-          raceId: insertedRace.id,
+          raceId: insertedRaces[insertedRaceName].id,
         },
       ]);
     }
